@@ -1,14 +1,12 @@
 # Vercel Shipping Checklist
 
-Lumina can ship as a Vite frontend plus the existing Express API exported from `backend/server.js`.
+Lumina ships as a Vercel Services project: a Vite frontend at `/` plus the existing Express API at `/api`.
 
 ## Vercel Project Settings
 
-- Framework preset: Vite
+- Framework preset: Services
 - Install command: `pnpm install`
-- Build command: `pnpm run build:frontend`
-- Output directory: `dist`
-- API rewrite: handled by `vercel.json`
+- Service config: handled by `vercel.json`
 
 ## Required Environment Variables
 

@@ -1,27 +1,21 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import {
-  LayoutDashboard,
-  History,
-  Grid3X3,
-  ListTree,
   Settings,
   LogOut,
   CheckCircle2,
   Bell,
   User,
-  UserCheck,
   AlertCircle,
   Clock,
   Cpu,
   TicketIcon,
   ChevronRight,
-  Inbox,
   Check,
 } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import Logo from "./Logo"
 import { useCurrentUser } from "../hooks/useCurrentUser"
-import { notificationsApi, usersApi, type ApiNotification, type ApiUser } from "../utils/apiClient"
+import { notificationsApi, type ApiNotification } from "../utils/apiClient"
 import "./Sidebar.css"
 
 const ACTION_LABELS: Record<string, string> = {
@@ -70,12 +64,8 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
   const [notifications, setNotifications] = useState<ApiNotification[]>([])
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set())
   const [notifLoading, setNotifLoading] = useState(false)
-  const [pendingApprovalCount, setPendingApprovalCount] = useState(0)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const notificationsRef = useRef<HTMLDivElement>(null)
-
-  const isAdmin = user?.role === "admin" || user?.role === "super_admin"
-  const isSuperAdmin = user?.role === "super_admin"
 
   const fetchNotifications = useCallback(async () => {
     setNotifLoading(true)
@@ -94,20 +84,6 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
     if (user) fetchNotifications()
   }, [user, fetchNotifications])
 
-  useEffect(() => {
-    if (!isSuperAdmin) return
-    let cancelled = false
-    ;(async () => {
-      const res = await usersApi.list()
-      if (!res.ok) return
-      const data = await res.json()
-      if (!cancelled) {
-        setPendingApprovalCount(Array.isArray(data) ? data.filter((u: ApiUser) => u.status === "pending").length : 0)
-      }
-    })()
-    return () => { cancelled = true }
-  }, [isSuperAdmin])
-
   const visibleNotifications = notifications.filter((n) => !hiddenIds.has(n.id))
   const unreadCount = visibleNotifications.length
 
@@ -116,42 +92,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
   }
 
   const menuItems = [
-    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, color: "#2563eb" },
-    { title: "Ticket Queue", url: "/tickets", icon: Inbox, color: "#1f8a65" },
-    { title: "Ticket History", url: "/tickets/history", icon: History, color: "#8b5cf6" },
-    ...(isAdmin
-      ? [
-          {
-            title: "Admin Dashboard",
-            url: isSuperAdmin ? "/super-admin/dashboard" : "/admin/dashboard",
-            icon: Grid3X3,
-            color: "#0ea5e9",
-          },
-        ]
-      : []),
-    ...(isSuperAdmin
-      ? [
-          {
-            title: "Approval Queue",
-            url: "/super-admin/approvals",
-            icon: UserCheck,
-            color: "#d97706",
-            badge: pendingApprovalCount,
-          },
-          {
-            title: "AI Routing Logs",
-            url: "/routing-logs",
-            icon: Cpu,
-            color: "#c08532",
-          },
-          {
-            title: "User Directory",
-            url: "/super-admin/users",
-            icon: ListTree,
-            color: "#64748b",
-          },
-        ]
-      : []),
+    { title: "Developer Workspace", url: "/workspace", icon: Cpu, color: "#2563eb" },
   ]
 
   useEffect(() => {
@@ -193,7 +134,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
     <aside className={`sidebar-container ${isCollapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
         <div className="sidebar-top-row">
-          <Link to="/dashboard" className="sidebar-brand-link" style={{ textDecoration: 'none' }}>
+          <Link to="/workspace" className="sidebar-brand-link" style={{ textDecoration: 'none' }}>
             <Logo size="sm" showText={false} />
             {!isCollapsed && <span className="sidebar-logo-text">Lumina</span>}
           </Link>
@@ -283,14 +224,11 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
               <Link
                 key={item.title}
                 to={item.url}
-                className={`sidebar-menu-item ${location.pathname === item.url || (item.url === "/dashboard" && location.pathname === "/dashboard/tickets") ? "active" : ""}`}
+                className={`sidebar-menu-item ${location.pathname === item.url ? "active" : ""}`}
                 title={isCollapsed ? item.title : ""}
               >
                 <item.icon style={{ color: item.color }} />
                 <span>{item.title}</span>
-                {'badge' in item && Boolean(item.badge) && (
-                  <span className="sidebar-nav-badge">{(item.badge ?? 0) > 9 ? '9+' : item.badge}</span>
-                )}
               </Link>
             ))}
           </nav>

@@ -1,24 +1,18 @@
 {
-  "version": 2,
-  "buildCommand": "pnpm run build:frontend",
-  "outputDirectory": "dist",
-  "functions": {
-    "backend/server.js": {
-      "runtime": "nodejs22.x"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/backend/server.js"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "experimentalServices": {
+    "frontend": {
+      "entrypoint": ".",
+      "routePrefix": "/",
+      "framework": "vite"
     },
-    {
-      "source": "/uploads/:path*",
-      "destination": "/backend/server.js"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/index.html"
+    "backend": {
+      "entrypoint": "backend/server.js",
+      "routePrefix": "/api",
+      "framework": "express",
+      "includeFiles": [
+        "backend/**"
+      ]
     }
-  ]
+  }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "Lumina",
+  "short_name": "Lumina",
+  "description": "AI developer issue operations for GitHub workflows.",
+  "start_url": "/workspace",
+  "display": "standalone",
+  "background_color": "#f7f7f4",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -81,7 +81,7 @@ export function LoginPage() {
         localStorage.setItem('authToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken || '');
       }
-      navigate('/dashboard');
+      navigate('/workspace');
     } catch {
       setErrors({ form: 'Failed to sign in. Please check your connection and try again.' });
     } finally {
