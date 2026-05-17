@@ -729,7 +729,7 @@ function LuminaWorkspacePage() {
                       ))}
                     </ul>
                   ) : null}
-                  <small>{activeRoutingRecommendation.source}</small>
+                  <small>{formatToken(activeRoutingRecommendation.source)}</small>
                 </div>
               ) : (
                 <p>Likely owner: {assignee?.name ?? 'Priya Nair'} based on labels, workload, and availability.</p>
@@ -744,7 +744,7 @@ function LuminaWorkspacePage() {
                     ))}
                   </ul>
                   <p>Verification: {activeIssueAnalysis.verification_plan.join(' ')}</p>
-                  <small>{activeIssueAnalysis.approval_status} · {activeIssueAnalysis.source}</small>
+                  <small>{formatToken(activeIssueAnalysis.approval_status)} · {formatToken(activeIssueAnalysis.source)}</small>
                 </div>
               ) : (
                 <p>Suggested verification: reproduce, patch the affected flow, then confirm status persistence and queue refresh.</p>

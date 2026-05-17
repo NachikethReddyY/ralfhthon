@@ -513,6 +513,18 @@
   border-top: 1px solid #efeee8;
 }
 
+.analysis-panel .ai-result-block {
+  display: grid;
+  align-items: stretch;
+}
+
+.analysis-panel .ai-result-block strong,
+.analysis-panel .ai-result-block p,
+.analysis-panel .ai-result-block ul,
+.analysis-panel .ai-result-block small {
+  min-width: 0;
+}
+
 .ai-result-block ul {
   margin-left: 18px;
   color: #3a3832;

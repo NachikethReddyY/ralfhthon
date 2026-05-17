@@ -8,11 +8,12 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
  *
  * Priority:
  * 1. `LUMINA_ENV_FILE` — absolute path, or relative to `process.cwd()`
- * 2. Profile-based file from `LUMINA_PROFILE`:
+ * 2. Repo-root `.env` when present. This is the local source of truth and
+ *    matches hosting platforms that inject the same variable names.
+ * 3. Profile-based file from `LUMINA_PROFILE`:
  *    - `development` | `local` → `.env.development`
  *    - `hosting` | `production` → `.env.hosting`
- *    If that file is missing, fall back to legacy `.env` when present.
- * 3. If `LUMINA_PROFILE` is unset: prefer `.env` if it exists, else `.env.development`.
+ * 4. If `LUMINA_PROFILE` is unset: prefer `.env.development`, then `.env.hosting`.
  *
  * On platforms like Vercel, secrets are often injected without a file; if the resolved
  * file is missing, we warn and skip `dotenv` (existing `process.env` values still apply).
@@ -30,16 +31,16 @@ function resolveEnvPath() {
   const hosting = path.join(REPO_ROOT, '.env.hosting');
 
   const rawProfile = process.env.LUMINA_PROFILE;
+  if (fs.existsSync(legacy)) return legacy;
+
   if (rawProfile) {
     const p = String(rawProfile).toLowerCase();
     const isHosting = p === 'hosting' || p === 'production';
     const named = isHosting ? hosting : development;
     if (fs.existsSync(named)) return named;
-    if (fs.existsSync(legacy)) return legacy;
     return named;
   }
 
-  if (fs.existsSync(legacy)) return legacy;
   if (fs.existsSync(development)) return development;
   if (fs.existsSync(hosting)) return hosting;
   return development;
