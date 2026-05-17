@@ -19,6 +19,10 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
  * file is missing, we warn and skip `dotenv` (existing `process.env` values still apply).
  */
 function resolveEnvPath() {
+  if (process.env.VERCEL && !process.env.LUMINA_ENV_FILE) {
+    return null;
+  }
+
   const override = process.env.LUMINA_ENV_FILE;
   if (override) {
     return path.isAbsolute(override)
@@ -30,7 +34,7 @@ function resolveEnvPath() {
   const development = path.join(REPO_ROOT, '.env.development');
   const hosting = path.join(REPO_ROOT, '.env.hosting');
 
-  const rawProfile = process.env.LUMINA_PROFILE;
+  const rawProfile = process.env.LUMINA_PROFILE || (process.env.VERCEL ? 'hosting' : '');
   if (fs.existsSync(legacy)) return legacy;
 
   if (rawProfile) {
@@ -49,8 +53,12 @@ function resolveEnvPath() {
 function loadRootEnv() {
   const pathToUse = resolveEnvPath();
 
+  if (!pathToUse) {
+    return null;
+  }
+
   if (!fs.existsSync(pathToUse)) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
       console.warn(
         `[env] No file at ${pathToUse}. Set variables in the host environment, or create this file (see .env.development.example / .env.hosting.example), or use LUMINA_ENV_FILE.`
       );

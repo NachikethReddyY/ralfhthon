@@ -13,11 +13,15 @@ Lumina ships as a Vercel Services project: a Vite frontend at `/` plus the exist
 ```bash
 NODE_ENV=production
 LUMINA_PROFILE=hosting
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+DATABASE_URL=postgresql://postgres:[YOUR-SUPABASE-DB-PASSWORD]@db.vuzfvgawbqbqrqbfuhzg.supabase.co:5432/postgres
+DATABASE_POOL_MAX=1
+DATABASE_APPLICATION_NAME=lumina-api
 JWT_SECRET=long-random-production-secret
 FRONTEND_URL=https://YOUR-VERCEL-DOMAIN.vercel.app
 VITE_API_URL=
 VITE_API_PREFIX=/api/v1
+VITE_SUPABASE_URL=https://vuzfvgawbqbqrqbfuhzg.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_4y7wbSInrQAcjKAjQrkjnA_P1jMi4Kv
 ```
 
 ## AI And GitHub Integrations
@@ -41,23 +45,23 @@ The GitHub token needs fine-grained access to the target repository:
 ```bash
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.0-flash
-VITE_SUPABASE_URL=https://vuzfvgawbqbqrqbfuhzg.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
 ## Database
 
-For local development:
+Production uses the Supabase Postgres database for project `vuzfvgawbqbqrqbfuhzg`. The direct connection string above works once the database password is filled in; for Vercel/serverless, prefer Supabase's connection pooler URL if it is available in the Supabase dashboard.
+
+Apply the schema against Supabase before testing login/signup:
+
+```bash
+psql "$DATABASE_URL" -f backend/db/DDL.sql
+```
+
+For local-only development, use `.env.development.example` and a local Postgres database.
 
 ```bash
 createdb ralfhton
 psql postgresql://nr@localhost:5432/ralfhton -f backend/db/DDL.sql
-```
-
-For hosted deployment, run the same schema against the production Postgres URL:
-
-```bash
-psql "$DATABASE_URL" -f backend/db/DDL.sql
 ```
 
 ## Smoke Test After Deploy
