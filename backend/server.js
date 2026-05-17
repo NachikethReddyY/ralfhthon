@@ -1,10 +1,17 @@
 require('./lib/loadRootEnv').loadRootEnv();
 
-const { createApp } = require('./app');
+const appModule = require('./app');
 const db = require('./db');
 
 const PORT = process.env.PORT || 6001;
-const app = createApp();
+const createApp = appModule.createApp || appModule.default?.createApp;
+const app = typeof createApp === 'function'
+  ? createApp()
+  : appModule.default || appModule;
+
+if (typeof app !== 'function') {
+  throw new TypeError('Express app entrypoint did not export an app or createApp()');
+}
 
 const initializeDatabase = async () => {
   try {

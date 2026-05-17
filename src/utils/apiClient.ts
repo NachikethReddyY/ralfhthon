@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:6001');
 const API_PREFIX = import.meta.env.VITE_API_PREFIX || '/api/v1';
 
 export type AuthValidationErrorBody = {

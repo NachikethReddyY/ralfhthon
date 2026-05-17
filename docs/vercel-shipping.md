@@ -14,9 +14,9 @@ Lumina ships as a Vercel Services project: a Vite frontend at `/` plus the exist
 NODE_ENV=production
 LUMINA_PROFILE=hosting
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
-JWT_ACCESS_SECRET=long-random-production-secret
+JWT_SECRET=long-random-production-secret
 FRONTEND_URL=https://YOUR-VERCEL-DOMAIN.vercel.app
-VITE_API_URL=https://YOUR-VERCEL-DOMAIN.vercel.app
+VITE_API_URL=
 VITE_API_PREFIX=/api/v1
 ```
 

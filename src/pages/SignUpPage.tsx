@@ -74,7 +74,7 @@ export function SignUpPage() {
         localStorage.setItem('authToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken || '');
       }
-      navigate('/dashboard');
+      navigate('/workspace');
     } catch {
       setErrors({ form: 'Failed to create account. Check your connection and try again.' });
     } finally {

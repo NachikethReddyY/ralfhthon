@@ -15,7 +15,7 @@ Required for persistent users, tickets, comments, and admin data.
 ### 2. JWT Secret
 
 ```bash
-JWT_ACCESS_SECRET=replace-with-long-random-secret
+JWT_SECRET=replace-with-long-random-secret
 ```
 
 Required for password login sessions. Use a long random value in production.
@@ -33,7 +33,7 @@ Required for real AI routing, Codex-style issue analysis, and ticket Q&A. Withou
 
 ```bash
 FRONTEND_URL=https://your-frontend-domain.com
-VITE_API_URL=https://your-api-domain.com
+VITE_API_URL=
 VITE_API_PREFIX=/api/v1
 ```
 
