@@ -1,0 +1,112 @@
+.pending-approval-page {
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+  color-scheme: only light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  width: 100%;
+}
+
+.pending-approval-decoration {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--color-hairline-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-hairline-soft) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pending-approval-card {
+  position: relative;
+  z-index: 1;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.pending-approval-logo {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.pending-approval-content {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.pending-approval-checkmark {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--color-semantic-success);
+}
+
+.pending-approval-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--color-ink);
+  margin: 0 0 12px 0;
+  letter-spacing: -0.325px;
+}
+
+.pending-approval-message {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin: 12px 0 16px 0;
+}
+
+.pending-approval-description {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-body);
+  margin: 0;
+}
+
+.pending-approval-footer {
+  text-align: center;
+  padding-top: 18px;
+  margin-top: 4px;
+  border-top: 1px solid var(--color-hairline-strong);
+}
+
+.pending-approval-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .pending-approval-card {
+    padding: 24px 18px;
+  }
+
+  .pending-approval-title {
+    font-size: 22px;
+  }
+
+  .pending-approval-checkmark {
+    margin-bottom: 16px;
+  }
+
+  .pending-approval-checkmark svg {
+    width: 60px;
+    height: 60px;
+  }
+}

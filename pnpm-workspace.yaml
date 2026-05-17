@@ -1,0 +1,7 @@
+packages:
+  - .
+  - backend
+allowBuilds:
+  esbuild: true
+  fallow: true
+  msw: true

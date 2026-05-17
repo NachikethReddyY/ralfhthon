@@ -1,0 +1,568 @@
+/* Onboarding Page — Lumina Design System (newdesign.md) */
+
+.onboarding-page {
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+  color-scheme: only light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  width: 100%;
+}
+
+.onboarding-decoration {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--color-hairline-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-hairline-soft) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Card */
+.onboarding-card {
+  position: relative;
+  z-index: 1;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.onboarding-logo {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.onboarding-header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.onboarding-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--color-ink);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.325px;
+}
+
+.onboarding-subtitle {
+  font-family: var(--font-body) !important;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-body);
+}
+
+/* User profile section */
+.onboarding-user-section {
+  margin: 0 auto 28px;
+  padding: 20px;
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
+  max-width: 100%;
+}
+
+/* Avatar */
+.onboarding-avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.onboarding-avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.onboarding-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-hairline-strong);
+  transition: border-color 0.15s;
+}
+
+.onboarding-avatar:hover {
+  border-color: var(--color-primary);
+}
+
+.onboarding-avatar-placeholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-surface-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-hairline-strong);
+}
+
+.onboarding-avatar-remove {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-semantic-error);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s;
+}
+
+.onboarding-avatar-remove:hover {
+  opacity: 0.85;
+}
+
+.avatar-initials {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  letter-spacing: -0.5px;
+}
+
+.onboarding-avatar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  color: var(--color-body);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.onboarding-avatar-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.onboarding-avatar-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* User info */
+.onboarding-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.onboarding-name-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.onboarding-user-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--color-ink);
+  letter-spacing: -0.2px;
+}
+
+.onboarding-user-email {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-body);
+}
+
+/* Verified badge */
+.onboarding-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  color: var(--color-semantic-success);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Super-admin role badge */
+.onboarding-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+/* Role selector */
+.role-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.role-selection label {
+  font-size: 11px;
+  font-weight: 600;
+  /* Use ink here; --color-muted is reserved for secondary text. */
+  color: var(--color-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.role-options {
+  display: flex;
+  gap: 8px;
+}
+
+.role-option {
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid var(--color-hairline-strong);
+  background: var(--color-canvas-soft);
+  color: var(--color-ink);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.role-option:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.role-option.active {
+  background: var(--color-pill-blue-bg);
+  border-color: var(--color-pill-blue-border);
+  color: var(--color-pill-blue-fg);
+  box-shadow: none;
+}
+
+/* Form */
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink) !important;
+}
+
+/* Scoped under .onboarding-form so global Dashboard.css `.form-group input` cannot override after route visits */
+.onboarding-form .form-input,
+.onboarding-form .form-select,
+.onboarding-form .form-group input,
+.onboarding-form .form-group select {
+  padding: 11px 14px;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 8px;
+  background-color: var(--color-surface-card);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+  color-scheme: only light;
+  -webkit-text-fill-color: var(--color-ink);
+}
+
+.onboarding-form .form-input::placeholder,
+.onboarding-form .form-group input::placeholder {
+  color: var(--color-muted-soft);
+}
+
+.onboarding-form .form-input:focus,
+.onboarding-form .form-select:focus,
+.onboarding-form .form-group input:focus,
+.onboarding-form .form-group select:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-hairline-strong));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.onboarding-form .form-input:disabled,
+.onboarding-form .form-select:disabled,
+.onboarding-form .form-group input:disabled,
+.onboarding-form .form-group select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--color-canvas-soft);
+}
+
+.onboarding-form .form-select,
+.onboarding-form .form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-color: var(--color-surface-card);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23807d72' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 44px;
+}
+
+/* Onboarding Submit Button */
+.onboarding-submit-btn {
+  background: #9ca3af !important;
+  color: #fff !important;
+  border: 1px solid #9ca3af !important;
+  transition: background 0.15s, border-color 0.15s !important;
+}
+
+.onboarding-submit-btn:not(:disabled):hover {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+}
+
+.onboarding-submit-btn:not(:disabled) {
+  background: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: #fff !important;
+}
+
+.onboarding-submit-btn:not(:disabled):hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.onboarding-submit-btn:disabled {
+  background: #d1d5db !important;
+  border-color: #d1d5db !important;
+  color: #9ca3af !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+/* Footer */
+.onboarding-footer {
+  text-align: center;
+  padding-top: 18px;
+  margin-top: 4px;
+  border-top: 1px solid var(--color-hairline-strong);
+}
+
+.onboarding-step-counter {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Crop / Confirmation Modal ── */
+.crop-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(38, 37, 30, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.crop-modal {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.crop-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.crop-modal-header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--color-ink);
+  letter-spacing: -0.2px;
+}
+
+.crop-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  color: var(--color-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.crop-modal-close:hover {
+  border-color: var(--color-hairline-strong);
+  color: var(--color-ink);
+}
+
+.crop-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: 350px;
+  background: var(--color-canvas-soft);
+  overflow: hidden;
+}
+
+.crop-container img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.crop-image {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.crop-modal-actions {
+  display: flex;
+  gap: 10px;
+  padding: 18px 20px;
+  border-top: 1px solid var(--color-hairline);
+}
+
+.btn-cancel,
+.btn-confirm {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+}
+
+.btn-cancel {
+  background: var(--color-canvas-soft);
+  color: var(--color-body);
+  border-color: var(--color-hairline-strong);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: var(--color-surface-strong);
+}
+
+.btn-confirm {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.btn-cancel:disabled,
+.btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmation-content {
+  padding: 20px;
+  text-align: center;
+}
+
+.confirmation-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-body);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .onboarding-card {
+    padding: 24px 18px;
+  }
+
+  .onboarding-title {
+    font-size: 22px;
+  }
+
+  .onboarding-avatar,
+  .onboarding-avatar-placeholder {
+    width: 72px;
+    height: 72px;
+  }
+
+  .crop-modal {
+    max-width: calc(100vw - 32px);
+  }
+
+  .crop-container {
+    max-height: 280px;
+    height: 280px;
+  }
+}

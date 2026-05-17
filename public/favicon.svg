@@ -1,0 +1,23 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lumina-grad" x1="64" y1="0" x2="64" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF8A5B" />
+      <stop offset="34%" stop-color="#FF7AAE" />
+      <stop offset="68%" stop-color="#C084FC" />
+      <stop offset="100%" stop-color="#A78BFA" />
+    </linearGradient>
+    <filter id="lumina-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feFlood flood-color="#FF8A5B" flood-opacity="0.22" result="warm" />
+      <feFlood flood-color="#C084FC" flood-opacity="0.18" result="cool" />
+      <feComposite in="warm" in2="blur" operator="in" result="warmGlow" />
+      <feComposite in="cool" in2="blur" operator="in" result="coolGlow" />
+      <feMerge>
+        <feMergeNode in="warmGlow" />
+        <feMergeNode in="coolGlow" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <path d="M64 0Q64 64 128 64Q64 64 64 128Q64 64 0 64Q64 64 64 0Z" fill="url(#lumina-grad)" filter="url(#lumina-glow)" />
+</svg>

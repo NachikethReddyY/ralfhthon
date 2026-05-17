@@ -1,0 +1,144 @@
+/* NamePrompt – centred modal for collecting the user's real name after OAuth */
+
+.name-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 25, 23, 0.38);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 24px;
+  animation: np-backdrop-in 0.2s ease-out;
+}
+
+@keyframes np-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.name-prompt-card {
+  position: relative;
+  width: min(420px, 100%);
+  background: var(--color-surface-card, #ffffff);
+  border: 1px solid var(--color-hairline-strong, #cfcdc4);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 24px 60px rgba(38, 37, 30, 0.14),
+    0  8px 20px rgba(38, 37, 30, 0.08);
+  animation: np-card-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes np-card-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.name-prompt-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-muted-soft, #5f5c54);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.name-prompt-close:hover {
+  background: var(--color-canvas-soft, #fafaf7);
+  color: var(--color-ink, #26251e);
+}
+
+.name-prompt-heading {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-ink, #26251e);
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.name-prompt-sub {
+  font-size: 14px;
+  color: var(--color-muted, #3a3832);
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+.name-prompt-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.name-prompt-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted-soft, #5f5c54);
+  margin-bottom: 6px;
+}
+
+.name-prompt-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--color-hairline-strong, #cfcdc4);
+  border-radius: 12px;
+  background: var(--color-canvas-soft, #fafaf7);
+  font-size: 15px;
+  font-family: var(--font-body);
+  color: var(--color-ink, #26251e);
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+  box-sizing: border-box;
+}
+.name-prompt-input::placeholder {
+  color: var(--color-muted-soft, #5f5c54);
+}
+.name-prompt-input:focus {
+  border-color: var(--color-primary, #2563eb);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+}
+
+.name-prompt-error {
+  font-size: 12px;
+  color: var(--color-semantic-error, #cf2d56);
+  margin: 4px 0 0;
+}
+
+.name-prompt-submit {
+  width: 100%;
+  padding: 13px 20px;
+  margin-top: 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, opacity 0.15s;
+  letter-spacing: 0.01em;
+}
+.name-prompt-submit:hover:not(:disabled) {
+  background: var(--color-primary-hover, #1d4ed8);
+  transform: translateY(-1px);
+}
+.name-prompt-submit:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}

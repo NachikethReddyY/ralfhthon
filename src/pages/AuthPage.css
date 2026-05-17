@@ -1,0 +1,446 @@
+/* Auth Pages — Lumina Design System (newdesign.md) */
+
+.auth-page {
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+  color-scheme: only light;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+}
+
+/* Subtle hairline grid decoration — editorial, not glowy */
+.auth-decoration {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--color-hairline-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-hairline-soft) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Card */
+.auth-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: 12px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo */
+.auth-logo {
+  display: flex;
+  justify-content: center;
+}
+
+.auth-logo a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-ink);
+  transition: opacity 0.2s;
+}
+
+.auth-logo a:hover {
+  opacity: 0.75;
+}
+
+/* Header */
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.auth-subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-ink); /* Max contrast override */
+  margin: 0;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .auth-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.password-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.password-header .input-label {
+  margin: 0;
+}
+
+/* Inline link — Lumina Blue */
+.auth-link-small {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.auth-link-small:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Error banner */
+.auth-error {
+  background-color: color-mix(in srgb, var(--color-semantic-error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-semantic-error) 20%, transparent);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-semantic-error);
+  text-align: center;
+}
+
+/* Buttons fill full width inside form */
+.auth-form button {
+  width: 100%;
+}
+
+/* Base button styles for auth pages */
+.auth-form .btn {
+  padding: 11px 14px !important;
+  border-radius: 8px !important;
+  font-family: var(--font-body) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+  border: 1px solid transparent !important;
+}
+
+/* Primary variant (Sign In) */
+.auth-form .btn--primary {
+  background: #3b82f6 !important;
+  color: #fff !important;
+  border-color: #3b82f6 !important;
+}
+
+.auth-form .btn--primary:hover:not(:disabled) {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.auth-form .btn--primary:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Secondary variant (Resend email, Enter 6-digit code) */
+.auth-form .btn--secondary {
+  background: #f3f4f6 !important;
+  color: var(--color-ink) !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.auth-form .btn--secondary:hover:not(:disabled) {
+  background: #e5e7eb !important;
+  border-color: #9ca3af !important;
+}
+
+.auth-form .btn--secondary:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.auth-google-wrap {
+  width: 100%;
+}
+
+/* Small hint text */
+.auth-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* Resend row */
+.auth-resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-top: 2px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.auth-resend-row .auth-hint {
+  color: var(--color-muted);
+}
+
+.auth-resend-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.auth-resend-btn:hover:not(:disabled) {
+  color: var(--color-primary-hover);
+  text-decoration-color: var(--color-primary-hover);
+}
+
+.auth-resend-btn:disabled {
+  color: var(--color-muted-soft);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.auth-hint code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-body);
+  background: var(--color-surface-strong);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Dev-only link (reset password in dev mode) */
+.auth-dev-link {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin: 0;
+  text-align: center;
+}
+
+.auth-dev-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #c08532; /* timeline-done warm gold */
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Notice banners */
+.auth-notice {
+  margin: 0;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.auth-notice--info {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: var(--color-primary-active);
+}
+
+.auth-notice--error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: var(--color-semantic-error);
+}
+
+.auth-notice--success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: var(--color-semantic-success);
+}
+
+/* Inline code in notices */
+.auth-inline-code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--color-surface-strong);
+  color: var(--color-body);
+}
+
+/* Divider */
+.auth-divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1px;
+  background: var(--color-hairline);
+  margin: 12px 0;
+}
+
+.auth-divider span {
+  position: relative;
+  background: var(--color-surface-card);
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Footer */
+.auth-footer {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.auth-footer p {
+  font-size: 14px;
+  color: var(--color-body);
+  margin: 0;
+}
+
+/* Page-level link (underlined) */
+.auth-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.auth-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* Success / email-sent state */
+.reset-success {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: center;
+  align-items: center;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  background-color: color-mix(in srgb, var(--color-semantic-success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-semantic-success) 20%, transparent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-semantic-success);
+}
+
+.success-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.success-subtext {
+  font-size: 14px;
+  color: var(--color-body);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.reset-success button {
+  width: 100%;
+}
+
+/* OTP form group (VerifyEmailOtpPage) */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 32px 24px;
+    gap: 22px;
+  }
+
+  .auth-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 12px;
+  }
+
+  .auth-card {
+    border-radius: 10px;
+    padding: 24px 18px;
+    gap: 18px;
+  }
+
+  .auth-title {
+    font-size: 22px;
+  }
+}

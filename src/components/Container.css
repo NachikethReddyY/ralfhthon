@@ -1,0 +1,39 @@
+/* Container Component - CSS3 */
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.container--sm {
+  max-width: 640px;
+}
+
+.container--md {
+  max-width: 896px;
+}
+
+.container--lg {
+  max-width: 1200px;
+}
+
+.container--xl {
+  max-width: 1440px;
+}
+
+.container--padded {
+  padding: 0 24px;
+}
+
+@media (max-width: 768px) {
+  .container--padded {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container--padded {
+    padding: 0 12px;
+  }
+}
