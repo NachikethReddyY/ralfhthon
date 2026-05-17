@@ -2,13 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import VerifyEmailOtpPage from './pages/VerifyEmailOtpPage';
-import OnboardingPage from './pages/OnboardingPage';
-import OAuthNamePage from './pages/OAuthNamePage';
-import PendingApprovalPage from './pages/PendingApprovalPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ServerErrorPage from './pages/ServerErrorPage';
 import UserDashboard from './pages/UserDashboard';
@@ -32,14 +25,6 @@ function App() {
         <Route path="/workspace" element={<LuminaWorkspacePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
-        <Route path="/verify-email-otp" element={<VerifyEmailOtpPage />} />
-
-        <Route path="/complete-profile" element={<ProtectedRoute><OAuthNamePage /></ProtectedRoute>} />
-        <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
-        <Route path="/pending-approval" element={<ProtectedRoute><PendingApprovalPage /></ProtectedRoute>} />
 
         <Route path="/dashboard" element={<ProtectedRoute><RoleDashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/tickets" element={<ProtectedRoute><RoleDashboardPage /></ProtectedRoute>} />

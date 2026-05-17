@@ -333,7 +333,7 @@ export function TicketDetailPage() {
   }
 
   const routing = ticket.metadata?.routing as { source?: string; reasoning?: string } | undefined;
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001';
 
   return (
     <DashboardLayout>

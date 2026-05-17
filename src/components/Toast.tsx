@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
-import { Toast as ToastType } from '../context/ToastContext';
+import { Toast as ToastType } from '../context/toast';
 import './Toast.css';
 
 interface ToastItemProps {

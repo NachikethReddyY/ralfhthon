@@ -75,7 +75,7 @@ router.patch('/me/password', requireAuth, async (req, res, next) => {
     );
     const row = result.rows[0];
     if (!row?.password_hash) {
-      return res.status(400).json({ error: 'No password set on this account (OAuth login)' });
+      return res.status(400).json({ error: 'No password set on this account (passwordless login)' });
     }
     const valid = await db.query(
       `SELECT (password_hash = crypt($1, password_hash)) AS ok FROM users WHERE id = $2`,
@@ -115,7 +115,7 @@ router.post('/me/avatar', requireAuthAny, avatarUpload.single('avatar'), async (
   }
 });
 
-// PATCH /me/name — update first_name and last_name (used by NamePrompt after OAuth)
+// PATCH /me/name — update first_name and last_name (used by NamePrompt when needed)
 router.patch('/me', requireAuthAny, async (req, res, next) => {
   const firstName = String(req.body?.firstName ?? '').trim();
   const lastName  = String(req.body?.lastName  ?? '').trim();

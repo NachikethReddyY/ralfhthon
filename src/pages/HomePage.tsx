@@ -85,7 +85,7 @@ function IdeMockup() {
             </div>
             <h3 className="hp-detail-title">Login page 500 on SSO</h3>
             <p className="hp-detail-body">
-              Users report a 500 error when attempting SSO login via Google OAuth.
+              Users report a 500 error when attempting SSO login via Social login.
               Reproducible on all browsers. First reported 12 minutes ago.
             </p>
           </div>
@@ -257,7 +257,7 @@ export function HomePage() {
         <Container maxWidth="xl">
           <div className="hp-footer-inner">
             <Logo size="sm" showText={true} />
-            <span className="hp-footer-copy">© 2026 Nachiketh Reddy. All rights reserved.</span>
+            <span className="hp-footer-copy">© 2026 Ralfhton Reddy. All rights reserved.</span>
           </div>
         </Container>
       </footer>

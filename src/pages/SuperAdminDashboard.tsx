@@ -10,7 +10,7 @@ import Button from '../components/Button';
 import Container from '../components/Container';
 import DashboardLayout from '../components/DashboardLayout';
 import { ticketsApi, usersApi, notificationsApi, type AdminWorkload, type ApiTicket, type ApiUser, type ApiAiDecision } from '../utils/apiClient';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/toast';
 import './Dashboard.css';
 import './SuperAdminDashboard.css';
 
@@ -261,7 +261,7 @@ export function SuperAdminDashboard() {
                         <div className="queue-item-info">
                           <div className="sa-user-avatar queue-avatar">
                             {account.avatar_url
-                              ? <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${account.avatar_url}`} alt="" />
+                              ? <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:6001'}${account.avatar_url}`} alt="" />
                               : `${account.first_name[0]}${account.last_name[0]}`}
                           </div>
                           <div className="queue-item-text">
@@ -339,7 +339,7 @@ export function SuperAdminDashboard() {
                           <div className="sa-user-cell">
                             <div className="sa-user-avatar">
                               {u.avatar_url
-                                ? <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${u.avatar_url}`} alt="" />
+                                ? <img src={`${import.meta.env.VITE_API_URL || 'http://localhost:6001'}${u.avatar_url}`} alt="" />
                                 : `${u.first_name[0]}${u.last_name[0]}`
                               }
                             </div>

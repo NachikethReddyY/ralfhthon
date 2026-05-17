@@ -9,7 +9,7 @@ import {
 } from '../utils/apiClient';
 import './SideChat.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001';
 
 function timeAgo(ts: string): string {
   const diff = Date.now() - new Date(ts).getTime();

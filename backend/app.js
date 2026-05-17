@@ -9,9 +9,10 @@ function createApp() {
   const app = express();
   app.disable('x-powered-by');
 
-  const origins = process.env.FRONTEND_URL
+  const configuredOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',').map((s) => s.trim()).filter(Boolean)
-    : true;
+    : [];
+  const allowLocalhost = process.env.NODE_ENV !== 'production';
 
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -22,7 +23,15 @@ function createApp() {
 
   app.use(
     cors({
-      origin: origins,
+      origin(origin, callback) {
+        if (!origin) return callback(null, true);
+        if (configuredOrigins.includes(origin)) return callback(null, true);
+        if (allowLocalhost && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+          return callback(null, true);
+        }
+        if (!configuredOrigins.length) return callback(null, true);
+        return callback(new Error(`CORS blocked origin: ${origin}`));
+      },
       credentials: true,
     })
   );

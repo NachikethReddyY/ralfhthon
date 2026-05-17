@@ -26,9 +26,6 @@ BEGIN
       'pending_routing'
     );
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'oauth_provider') THEN
-    CREATE TYPE oauth_provider AS ENUM ('google');
-  END IF;
 END $$;
 
 -- Users
@@ -138,41 +135,6 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 );
 CREATE INDEX IF NOT EXISTS idx_chat_messages_conv ON chat_messages (conversation_id, created_at ASC);
 
--- OAuth accounts
-CREATE TABLE IF NOT EXISTS oauth_accounts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  provider oauth_provider NOT NULL,
-  provider_user_id VARCHAR(255) UNIQUE NOT NULL,
-  access_token TEXT,
-  refresh_token TEXT,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Email verifications
-CREATE TABLE IF NOT EXISTS email_verifications (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token VARCHAR(255) UNIQUE NOT NULL,
-  otp_hash TEXT,
-  otp_expires_at TIMESTAMP,
-  expires_at TIMESTAMP NOT NULL,
-  used_at TIMESTAMP
-);
-
--- If the table already exists (from an older init.sql), ensure the OTP column exists too.
-ALTER TABLE email_verifications ADD COLUMN IF NOT EXISTS otp_hash TEXT;
-ALTER TABLE email_verifications ADD COLUMN IF NOT EXISTS otp_expires_at TIMESTAMP;
-
--- Password resets
-CREATE TABLE IF NOT EXISTS password_reset (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token VARCHAR(255) UNIQUE NOT NULL,
-  expires_at TIMESTAMP NOT NULL,
-  used_at TIMESTAMP
-);
-
 -- Sessions
 CREATE TABLE IF NOT EXISTS sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -192,8 +154,6 @@ CREATE INDEX IF NOT EXISTS idx_tickets_category_id ON tickets (category_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_status_priority ON tickets (status, priority);
 CREATE INDEX IF NOT EXISTS idx_ticket_assignment_active ON ticket_assignment (ticket_id, assigned_to, is_active);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_actor_id ON audit_logs (actor_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_email_verifications_user_id ON email_verifications (user_id, used_at, expires_at);
-CREATE INDEX IF NOT EXISTS idx_password_reset_user_id ON password_reset (user_id, used_at, expires_at);
 
 CREATE OR REPLACE VIEW admin_workload AS
 SELECT
@@ -223,15 +183,16 @@ GROUP BY u.id, u.email, u.first_name, u.last_name;
 
 -- Seed users for local development and demos.
 INSERT INTO users (
-  email, password_hash, first_name, last_name, role, status, email_is_verified, approved_at
+  email, password_hash, first_name, last_name, role, status, email_is_verified, onboarding_completed, approved_at
 )
 VALUES (
-  lower('ynrdevs@gmail.com'),
-  crypt('Nachiketh1', gen_salt('bf')),
-  'Nachiketh',
-  'Reddy',
+  lower('super@ralfhton.test'),
+  crypt('Testpass1', gen_salt('bf')),
+  'Ralfhton',
+  'Owner',
   'super_admin'::user_role,
   'active'::user_status,
+  TRUE,
   TRUE,
   NOW()
 )
@@ -241,10 +202,11 @@ SET first_name = EXCLUDED.first_name,
     role = EXCLUDED.role,
     status = EXCLUDED.status,
     email_is_verified = EXCLUDED.email_is_verified,
+    onboarding_completed = EXCLUDED.onboarding_completed,
     approved_at = COALESCE(users.approved_at, NOW());
 
 INSERT INTO users (
-  email, password_hash, first_name, last_name, role, status, email_is_verified, approved_by, approved_at
+  email, password_hash, first_name, last_name, role, status, email_is_verified, onboarding_completed, approved_by, approved_at
 )
 SELECT
   lower(seed.email),
@@ -254,25 +216,21 @@ SELECT
   seed.role::user_role,
   seed.status::user_status,
   seed.email_is_verified,
-  (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com')),
+  TRUE,
+  (SELECT id FROM users WHERE email = lower('super@ralfhton.test')),
   CASE WHEN seed.status = 'active' THEN NOW() ELSE NULL END
 FROM (
   VALUES
-    ('admin.hardware@lumina.test', 'Testpass1', 'Harper', 'Hardware', 'admin', 'active', TRUE),
-    ('admin.software@lumina.test', 'Testpass1', 'Sage', 'Software', 'admin', 'active', TRUE),
-    ('admin.bugs@lumina.test', 'Testpass1', 'Bianca', 'Bugs', 'admin', 'active', TRUE),
-    ('admin.ops@lumina.test', 'Testpass1', 'Opal', 'Ops', 'admin', 'active', TRUE),
-    ('admin.qa@lumina.test', 'Testpass1', 'Quinn', 'Assurance', 'admin', 'active', TRUE),
-    ('alice.user@lumina.test', 'Testpass1', 'Alice', 'User', 'user', 'active', TRUE),
-    ('bob.user@lumina.test', 'Testpass1', 'Bob', 'User', 'user', 'active', TRUE),
-    ('carol.user@lumina.test', 'Testpass1', 'Carol', 'User', 'user', 'active', TRUE),
-    ('dan.user@lumina.test', 'Testpass1', 'Dan', 'User', 'user', 'active', TRUE),
-    ('eve.user@lumina.test', 'Testpass1', 'Eve', 'User', 'user', 'active', TRUE),
-    ('pending.user1@lumina.test', 'Testpass1', 'Pending', 'UserOne', 'user', 'pending', TRUE),
-    ('pending.user2@lumina.test', 'Testpass1', 'Pending', 'UserTwo', 'user', 'pending', TRUE),
-    ('pending.user3@lumina.test', 'Testpass1', 'Pending', 'UserThree', 'user', 'pending', TRUE),
-    ('pending.admin1@lumina.test', 'Testpass1', 'Pending', 'AdminOne', 'admin', 'pending', TRUE),
-    ('pending.admin2@lumina.test', 'Testpass1', 'Pending', 'AdminTwo', 'admin', 'pending', TRUE)
+    ('admin.hardware@ralfhton.test', 'Testpass1', 'Harper', 'Hardware', 'admin', 'active', TRUE),
+    ('admin.software@ralfhton.test', 'Testpass1', 'Sage', 'Software', 'admin', 'active', TRUE),
+    ('admin.bugs@ralfhton.test', 'Testpass1', 'Bianca', 'Bugs', 'admin', 'active', TRUE),
+    ('admin.ops@ralfhton.test', 'Testpass1', 'Opal', 'Ops', 'admin', 'active', TRUE),
+    ('admin.qa@ralfhton.test', 'Testpass1', 'Quinn', 'Assurance', 'admin', 'active', TRUE),
+    ('alice.user@ralfhton.test', 'Testpass1', 'Alice', 'User', 'user', 'active', TRUE),
+    ('bob.user@ralfhton.test', 'Testpass1', 'Bob', 'User', 'user', 'active', TRUE),
+    ('carol.user@ralfhton.test', 'Testpass1', 'Carol', 'User', 'user', 'active', TRUE),
+    ('dan.user@ralfhton.test', 'Testpass1', 'Dan', 'User', 'user', 'active', TRUE),
+    ('eve.user@ralfhton.test', 'Testpass1', 'Eve', 'User', 'user', 'active', TRUE)
 ) AS seed(email, password, first_name, last_name, role, status, email_is_verified)
 ON CONFLICT (email) DO UPDATE
 SET first_name = EXCLUDED.first_name,
@@ -280,17 +238,18 @@ SET first_name = EXCLUDED.first_name,
     role = EXCLUDED.role,
     status = EXCLUDED.status,
     email_is_verified = EXCLUDED.email_is_verified,
+    onboarding_completed = EXCLUDED.onboarding_completed,
     approved_by = EXCLUDED.approved_by,
     approved_at = COALESCE(users.approved_at, EXCLUDED.approved_at);
 
 INSERT INTO categories (name, description, created_by, is_active)
 SELECT *
 FROM (
-  SELECT 'Hardware Support', 'Device issues, peripherals, and workstation setup', (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com')), TRUE
+  SELECT 'Hardware Support', 'Device issues, peripherals, and workstation setup', (SELECT id FROM users WHERE email = lower('super@ralfhton.test')), TRUE
   UNION ALL
-  SELECT 'Software Support', 'Application access, account tooling, and configuration help', (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com')), TRUE
+  SELECT 'Software Support', 'Application access, account tooling, and configuration help', (SELECT id FROM users WHERE email = lower('super@ralfhton.test')), TRUE
   UNION ALL
-  SELECT 'Bug Reports', 'Crashes, defects, and reproducible product issues', (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com')), TRUE
+  SELECT 'Bug Reports', 'Crashes, defects, and reproducible product issues', (SELECT id FROM users WHERE email = lower('super@ralfhton.test')), TRUE
 ) AS seeded_categories(name, description, created_by, is_active)
 ON CONFLICT DO NOTHING;
 
@@ -309,21 +268,21 @@ SELECT
   seed.metadata::jsonb
 FROM (
   VALUES
-    ('Laptop screen flickering', 'The display flickers whenever I open design software.', 'Hardware Support', 'hardware', 'P2', 'assigned', 'alice.user@lumina.test', 'Open Illustrator and resize the window.', '{"source":"seed","routing":{"source":"seed","reasoning":"Balanced to least-loaded admin."}}'),
-    ('VPN login blocked', 'The VPN rejects my password after the latest reset.', 'Software Support', 'software', 'P1', 'in_progress', 'bob.user@lumina.test', 'Open VPN client and attempt login.', '{"source":"seed","routing":{"source":"seed","reasoning":"Critical auth issue routed to active admin."}}'),
-    ('App crashes on startup', 'The app closes instantly after showing the splash screen.', 'Bug Reports', 'bug', 'P1', 'open', 'carol.user@lumina.test', 'Launch app on Windows 11 after fresh install.', '{"source":"seed","routing":{"source":"seed","reasoning":"Awaiting active investigation."}}'),
-    ('Keyboard replacement request', 'Several keys are sticking and no longer register.', 'Hardware Support', 'hardware', 'P3', 'resolved', 'dan.user@lumina.test', 'Issue persists across multiple reboots.', '{"source":"seed"}'),
-    ('Reporting export timeout', 'CSV export times out after around 30 seconds.', 'Software Support', 'software', 'P2', 'assigned', 'eve.user@lumina.test', 'Run export from finance dashboard.', '{"source":"seed"}'),
-    ('Blue screen after update', 'Laptop hits a blue screen after the latest driver patch.', 'Hardware Support', 'hardware', 'P1', 'open', 'alice.user@lumina.test', 'Occurs during boot.', '{"source":"seed"}'),
-    ('Notification emails delayed', 'Password reset emails arrive after 15 minutes.', 'Software Support', 'software', 'P2', 'closed', 'bob.user@lumina.test', 'Triggered from forgot password page.', '{"source":"seed"}'),
-    ('Search results missing records', 'Two recent tickets do not appear in search results.', 'Bug Reports', 'bug', 'P2', 'in_progress', 'carol.user@lumina.test', 'Search by ticket title after creating a ticket.', '{"source":"seed"}'),
-    ('Docking station not detected', 'The docking station is not recognized after reconnecting.', 'Hardware Support', 'hardware', 'P3', 'assigned', 'dan.user@lumina.test', 'Reconnect dock after wake from sleep.', '{"source":"seed"}'),
-    ('SSO callback loop', 'Logging in with SSO keeps redirecting back to the login page.', 'Software Support', 'software', 'P1', 'resolved', 'eve.user@lumina.test', 'Happens in Chrome and Edge.', '{"source":"seed"}'),
-    ('Attachment upload fails', 'PNG attachments fail with a 500 error.', 'Bug Reports', 'bug', 'P2', 'pending_routing', 'alice.user@lumina.test', 'Upload 2MB PNG to a new ticket.', '{"source":"seed"}'),
-    ('Monitor color calibration issue', 'External monitor colors shifted after reconnect.', 'Hardware Support', 'hardware', 'P4', 'closed', 'bob.user@lumina.test', 'Reconnect HDMI after sleep.', '{"source":"seed"}'),
-    ('License activation stuck', 'Activation spinner never completes for a desktop tool.', 'Software Support', 'software', 'P3', 'assigned', 'carol.user@lumina.test', 'Click activate after entering key.', '{"source":"seed"}'),
-    ('Mobile UI overlaps buttons', 'Action buttons overlap on iPhone Safari.', 'Bug Reports', 'bug', 'P3', 'in_progress', 'dan.user@lumina.test', 'Open settings on iPhone 14.', '{"source":"seed"}'),
-    ('Printer queue jam', 'The office printer queue stalls after one successful print.', 'Hardware Support', 'hardware', 'P4', 'open', 'eve.user@lumina.test', 'Send multiple print jobs in sequence.', '{"source":"seed"}')
+    ('Laptop screen flickering', 'The display flickers whenever I open design software.', 'Hardware Support', 'hardware', 'P2', 'assigned', 'alice.user@ralfhton.test', 'Open Illustrator and resize the window.', '{"source":"seed","routing":{"source":"seed","reasoning":"Balanced to least-loaded admin."}}'),
+    ('VPN login blocked', 'The VPN rejects my password after the latest reset.', 'Software Support', 'software', 'P1', 'in_progress', 'bob.user@ralfhton.test', 'Open VPN client and attempt login.', '{"source":"seed","routing":{"source":"seed","reasoning":"Critical auth issue routed to active admin."}}'),
+    ('App crashes on startup', 'The app closes instantly after showing the splash screen.', 'Bug Reports', 'bug', 'P1', 'open', 'carol.user@ralfhton.test', 'Launch app on Windows 11 after fresh install.', '{"source":"seed","routing":{"source":"seed","reasoning":"Awaiting active investigation."}}'),
+    ('Keyboard replacement request', 'Several keys are sticking and no longer register.', 'Hardware Support', 'hardware', 'P3', 'resolved', 'dan.user@ralfhton.test', 'Issue persists across multiple reboots.', '{"source":"seed"}'),
+    ('Reporting export timeout', 'CSV export times out after around 30 seconds.', 'Software Support', 'software', 'P2', 'assigned', 'eve.user@ralfhton.test', 'Run export from finance dashboard.', '{"source":"seed"}'),
+    ('Blue screen after update', 'Laptop hits a blue screen after the latest driver patch.', 'Hardware Support', 'hardware', 'P1', 'open', 'alice.user@ralfhton.test', 'Occurs during boot.', '{"source":"seed"}'),
+    ('Notification emails delayed', 'Password reset emails arrive after 15 minutes.', 'Software Support', 'software', 'P2', 'closed', 'bob.user@ralfhton.test', 'Triggered from forgot password page.', '{"source":"seed"}'),
+    ('Search results missing records', 'Two recent tickets do not appear in search results.', 'Bug Reports', 'bug', 'P2', 'in_progress', 'carol.user@ralfhton.test', 'Search by ticket title after creating a ticket.', '{"source":"seed"}'),
+    ('Docking station not detected', 'The docking station is not recognized after reconnecting.', 'Hardware Support', 'hardware', 'P3', 'assigned', 'dan.user@ralfhton.test', 'Reconnect dock after wake from sleep.', '{"source":"seed"}'),
+    ('SSO callback loop', 'Logging in with SSO keeps redirecting back to the login page.', 'Software Support', 'software', 'P1', 'resolved', 'eve.user@ralfhton.test', 'Happens in Chrome and Edge.', '{"source":"seed"}'),
+    ('Attachment upload fails', 'PNG attachments fail with a 500 error.', 'Bug Reports', 'bug', 'P2', 'pending_routing', 'alice.user@ralfhton.test', 'Upload 2MB PNG to a new ticket.', '{"source":"seed"}'),
+    ('Monitor color calibration issue', 'External monitor colors shifted after reconnect.', 'Hardware Support', 'hardware', 'P4', 'closed', 'bob.user@ralfhton.test', 'Reconnect HDMI after sleep.', '{"source":"seed"}'),
+    ('License activation stuck', 'Activation spinner never completes for a desktop tool.', 'Software Support', 'software', 'P3', 'assigned', 'carol.user@ralfhton.test', 'Click activate after entering key.', '{"source":"seed"}'),
+    ('Mobile UI overlaps buttons', 'Action buttons overlap on iPhone Safari.', 'Bug Reports', 'bug', 'P3', 'in_progress', 'dan.user@ralfhton.test', 'Open settings on iPhone 14.', '{"source":"seed"}'),
+    ('Printer queue jam', 'The office printer queue stalls after one successful print.', 'Hardware Support', 'hardware', 'P4', 'open', 'eve.user@ralfhton.test', 'Send multiple print jobs in sequence.', '{"source":"seed"}')
 ) AS seed(title, description, category_name, type, priority, status, submitter_email, replication_steps, metadata)
 JOIN categories c ON lower(c.name) = lower(seed.category_name)
 JOIN users u ON u.email = lower(seed.submitter_email)
@@ -338,20 +297,20 @@ SELECT
   NOW() - (seed.days_ago * INTERVAL '1 day')
 FROM (
   VALUES
-    ('Laptop screen flickering', 'admin.hardware@lumina.test', 7),
-    ('VPN login blocked', 'admin.software@lumina.test', 6),
-    ('Keyboard replacement request', 'admin.hardware@lumina.test', 10),
-    ('Reporting export timeout', 'admin.ops@lumina.test', 4),
-    ('Notification emails delayed', 'admin.qa@lumina.test', 8),
-    ('Search results missing records', 'admin.bugs@lumina.test', 5),
-    ('Docking station not detected', 'admin.hardware@lumina.test', 3),
-    ('SSO callback loop', 'admin.software@lumina.test', 9),
-    ('License activation stuck', 'admin.qa@lumina.test', 2),
-    ('Mobile UI overlaps buttons', 'admin.bugs@lumina.test', 1)
+    ('Laptop screen flickering', 'admin.hardware@ralfhton.test', 7),
+    ('VPN login blocked', 'admin.software@ralfhton.test', 6),
+    ('Keyboard replacement request', 'admin.hardware@ralfhton.test', 10),
+    ('Reporting export timeout', 'admin.ops@ralfhton.test', 4),
+    ('Notification emails delayed', 'admin.qa@ralfhton.test', 8),
+    ('Search results missing records', 'admin.bugs@ralfhton.test', 5),
+    ('Docking station not detected', 'admin.hardware@ralfhton.test', 3),
+    ('SSO callback loop', 'admin.software@ralfhton.test', 9),
+    ('License activation stuck', 'admin.qa@ralfhton.test', 2),
+    ('Mobile UI overlaps buttons', 'admin.bugs@ralfhton.test', 1)
 ) AS seed(ticket_title, assignee_email, days_ago)
 JOIN tickets t ON t.title = seed.ticket_title
 JOIN users assignee ON assignee.email = lower(seed.assignee_email)
-JOIN users approver ON approver.email = lower('ynrdevs@gmail.com')
+JOIN users approver ON approver.email = lower('super@ralfhton.test')
 WHERE NOT EXISTS (SELECT 1 FROM ticket_assignment);
 
 INSERT INTO satisfaction_ratings (ticket_id, rated_by, rating, comment)
@@ -362,9 +321,9 @@ SELECT
   seed.comment
 FROM (
   VALUES
-    ('Keyboard replacement request', 'dan.user@lumina.test', 5, 'Fast turnaround and clear updates.'),
-    ('Notification emails delayed', 'bob.user@lumina.test', 4, 'Issue fixed after SMTP tuning.'),
-    ('SSO callback loop', 'eve.user@lumina.test', 5, 'Resolved quickly with a clean workaround.')
+    ('Keyboard replacement request', 'dan.user@ralfhton.test', 5, 'Fast turnaround and clear updates.'),
+    ('Notification emails delayed', 'bob.user@ralfhton.test', 4, 'Issue fixed after SMTP tuning.'),
+    ('SSO callback loop', 'eve.user@ralfhton.test', 5, 'Resolved quickly with a clean workaround.')
 ) AS seed(ticket_title, user_email, rating, comment)
 JOIN tickets t ON t.title = seed.ticket_title
 JOIN users u ON u.email = lower(seed.user_email)
@@ -377,52 +336,9 @@ SELECT
   seed.metadata::jsonb
 FROM (
   VALUES
-    ('ynrdevs@gmail.com', 'seed_users_loaded', '{"source":"init.sql"}'),
-    ('ynrdevs@gmail.com', 'seed_tickets_loaded', '{"source":"init.sql"}'),
-    ('admin.hardware@lumina.test', 'seed_assignment_reviewed', '{"source":"init.sql","area":"hardware"}')
+    ('super@ralfhton.test', 'seed_users_loaded', '{"source":"init.sql"}'),
+    ('super@ralfhton.test', 'seed_tickets_loaded', '{"source":"init.sql"}'),
+    ('admin.hardware@ralfhton.test', 'seed_assignment_reviewed', '{"source":"init.sql","area":"hardware"}')
 ) AS seed(actor_email, action, metadata)
 JOIN users actor ON actor.email = lower(seed.actor_email)
 WHERE NOT EXISTS (SELECT 1 FROM audit_logs);
-
--- Clean up legacy demo accounts from earlier local seeds so routing and approvals stay focused
--- on the current Lumina test set.
-UPDATE categories
-SET created_by = (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com'))
-WHERE created_by = (SELECT id FROM users WHERE email = lower('admin@example.com'));
-
-UPDATE ticket_assignment
-SET assigned_to = (SELECT id FROM users WHERE email = lower('admin.hardware@lumina.test'))
-WHERE assigned_to IN (
-  (SELECT id FROM users WHERE email = lower('admin@example.com')),
-  (SELECT id FROM users WHERE email = lower('y.nachiketh.reddy@gmail.com')),
-  (SELECT id FROM users WHERE email = lower('itsnachikethreddy@gmail.com')),
-  (SELECT id FROM users WHERE email = lower('ynrworks@gmail.com'))
-);
-
-UPDATE ticket_assignment
-SET assigned_by = (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com'))
-WHERE assigned_by = (SELECT id FROM users WHERE email = lower('admin@example.com'));
-
-UPDATE users
-SET approved_by = (SELECT id FROM users WHERE email = lower('ynrdevs@gmail.com'))
-WHERE approved_by = (SELECT id FROM users WHERE email = lower('admin@example.com'));
-
-UPDATE audit_logs
-SET actor_id = (SELECT id FROM users WHERE email = lower('admin.hardware@lumina.test'))
-WHERE actor_id IN (
-  (SELECT id FROM users WHERE email = lower('y.nachiketh.reddy@gmail.com')),
-  (SELECT id FROM users WHERE email = lower('itsnachikethreddy@gmail.com')),
-  (SELECT id FROM users WHERE email = lower('ynrworks@gmail.com'))
-);
-
-DELETE FROM users
-WHERE email IN (
-  lower('admin@example.com'),
-  lower('alice@test.lumina'),
-  lower('bob@test.lumina'),
-  lower('carol@test.lumina'),
-  lower('itsnachikethreddyy@gmail.com'),
-  lower('y.nachiketh.reddy@gmail.com'),
-  lower('itsnachikethreddy@gmail.com'),
-  lower('ynrworks@gmail.com')
-);

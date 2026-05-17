@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001';
 const API_PREFIX = import.meta.env.VITE_API_PREFIX || '/api/v1';
 
 export type AuthValidationErrorBody = {
@@ -143,7 +143,7 @@ const getAuthToken = (): string | null => {
 
 const isAuthPublicPath = (): boolean => {
   const path = window.location.pathname;
-  const publicPrefixes = ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-email'];
+  const publicPrefixes = ['/login', '/signup'];
   return publicPrefixes.some((p) => path === p || path.startsWith(`${p}/`));
 };
 
@@ -191,24 +191,6 @@ export const authApi = {
 
   signup: (data: { email: string; firstName: string; lastName: string; password: string; role?: string }) =>
     apiRequest('/auth/signup', { method: 'POST', body: data }),
-
-  google: (data: { credential?: string; accessToken?: string }) =>
-    apiRequest('/auth/google', { method: 'POST', body: data }),
-
-  forgotPassword: (email: string) =>
-    apiRequest('/auth/forgot-password', { method: 'POST', body: { email } }),
-
-  resetPassword: (token: string, password: string) =>
-    apiRequest('/auth/reset-password', { method: 'POST', body: { token, password } }),
-
-  verifyEmail: (token: string) =>
-    apiRequest('/auth/verify-email', { method: 'POST', body: { token } }),
-
-  verifyEmailOtp: (email: string, otp: string) =>
-    apiRequest('/auth/verify-email-otp', { method: 'POST', body: { email, otp } }),
-
-  resendVerification: (email: string) =>
-    apiRequest('/auth/resend-verification', { method: 'POST', body: { email } }),
 
   refreshToken: () =>
     apiRequest('/auth/refresh', { method: 'POST', body: { refreshToken: localStorage.getItem('refreshToken') } }),

@@ -323,7 +323,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
         <button className="user-profile-btn" onClick={() => setShowUserMenu(!showUserMenu)}>
           {user?.avatar_url ? (
             <img
-              src={`${import.meta.env.VITE_API_URL || "http://localhost:5000"}${user.avatar_url}`}
+              src={`${import.meta.env.VITE_API_URL || "http://localhost:6001"}${user.avatar_url}`}
               alt="avatar"
               className="avatar"
               style={{ objectFit: "cover" }}

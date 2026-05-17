@@ -8,7 +8,7 @@ import Logo from '../components/Logo';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import { useCurrentUser } from '../hooks/useCurrentUser';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/toast';
 import { usersApi } from '../utils/apiClient';
 import './OnboardingPage.css';
 
@@ -244,7 +244,7 @@ export function OnboardingPage() {
                   {avatarPreview || user.avatar_url ? (
                     <img
                       key={avatarPreview || user.avatar_url}
-                      src={avatarPreview || `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${user.avatar_url}`}
+                      src={avatarPreview || `${import.meta.env.VITE_API_URL || 'http://localhost:6001'}${user.avatar_url}`}
                       alt={user.first_name}
                       className="onboarding-avatar"
                     />

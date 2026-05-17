@@ -1,4 +1,4 @@
-/* NamePrompt – centred modal for collecting the user's real name after OAuth */
+/* NamePrompt – centred modal for collecting the user's real name when needed */
 
 .name-prompt-backdrop {
   position: fixed;

@@ -73,7 +73,7 @@ export function NamePrompt({ open, onDone, onCancel }: Props) {
             id="np-first"
             className="name-prompt-input"
             type="text"
-            placeholder="e.g. Nachiketh"
+            placeholder="e.g. Ralfhton"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}

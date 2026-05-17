@@ -20,7 +20,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 const PAGE_SIZE = 12;
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:6001';
 
 type SortKey = 'priority' | 'title' | 'status' | 'category' | 'assignee' | 'created';
 type SortDir = 'asc' | 'desc';

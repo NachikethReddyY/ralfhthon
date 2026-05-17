@@ -157,7 +157,7 @@ const seededIssues: LuminaIssue[] = [
 
 const statuses: IssueStatus[] = ['open', 'triaged', 'assigned', 'in_progress', 'blocked', 'resolved'];
 const severities: IssueSeverity[] = ['critical', 'high', 'medium', 'low'];
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001';
 const API_PREFIX = import.meta.env.VITE_API_PREFIX || '/api/v1';
 
 function formatStatus(status: IssueStatus): string {

@@ -1,232 +1,112 @@
-# What We Need From You To Ship Lumina
+# What We Need From You To Run Lumina
 
-This is the practical handoff list. The product now has a complete MVP loop in code, with mock fallbacks where external services are not configured.
+Lumina is now trimmed to the main product: simple email/password login, user management basics, GitHub-shaped issue intake, AI routing, Codex-style issue analysis, approvals, and sync-back shape.
 
-## Current MVP Status
+## Required Keys And Config
 
-Implemented and verified:
-
-- Workspace at `/workspace`
-- GitHub repository linking shape
-- GitHub issue import shape
-- Duplicate-safe imported issue upsert
-- Mock GitHub import fallback
-- Lumina-native issue creation
-- Issue status updates
-- AI routing recommendation
-- Human-applied routing
-- Bulk routing preview
-- Codex-style issue analysis
-- Developer approval states:
-  - `awaiting_go`
-  - `approved`
-  - `needs_more_info`
-- Sync-back endpoint shape
-- Audit event endpoint
-- OpenAI integration with rules fallback
-- Gemini fallback remains available for older ticket flows
-- Frontend build verification
-- Backend smoke test
-
-Verified commands:
+### 1. Database
 
 ```bash
-pnpm run build:frontend
-pnpm --dir backend test
-node --check backend/routes/lumina.js
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
-## Required From You
+Required for persistent users, tickets, comments, and admin data.
 
-### 1. OpenAI
-
-Required for real AI routing and analysis:
+### 2. JWT Secret
 
 ```bash
-OPENAI_API_KEY=
+JWT_ACCESS_SECRET=replace-with-long-random-secret
+```
+
+Required for password login sessions. Use a long random value in production.
+
+### 3. OpenAI
+
+```bash
+OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4.1-mini
 ```
 
-Recommended:
+Required for real AI routing, Codex-style issue analysis, and ticket Q&A. Without this, the Lumina workspace still demos with deterministic fallback logic.
 
-- Set a monthly spend limit in the OpenAI dashboard.
-- Use a project-scoped key for Lumina, not a personal all-purpose key.
-
-### 2. PostgreSQL
-
-Required for production persistence:
+### 4. Frontend/API URLs
 
 ```bash
-DATABASE_URL=
+FRONTEND_URL=https://your-frontend-domain.com
+VITE_API_URL=https://your-api-domain.com
+VITE_API_PREFIX=/api/v1
 ```
 
-We need:
-
-- Database host
-- Database name
-- User
-- Password
-- Port
-- SSL requirement, if any
-
-Current MVP Lumina workspace data is in-memory. The existing auth/ticket system already expects PostgreSQL.
-
-### 3. Auth Secrets
-
-Required:
+For local development:
 
 ```bash
-JWT_ACCESS_SECRET=
-JWT_REFRESH_SECRET=
+FRONTEND_URL=http://localhost:5173,http://localhost:5174,http://localhost:5175
+VITE_API_URL=http://localhost:6001
+VITE_API_PREFIX=/api/v1
 ```
 
-Provide two different long random strings.
+## Optional Keys
 
-### 4. Email Provider
-
-Required for account verification and password reset:
+### Supabase Project Config
 
 ```bash
-SMTP_HOST=
-SMTP_PORT=
-SMTP_SECURE=
-SMTP_USER=
-SMTP_PASSWORD=
-SMTP_FROM_EMAIL=
+VITE_SUPABASE_URL=https://vuzfvgawbqbqrqbfuhzg.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_4y7wbSInrQAcjKAjQrkjnA_P1jMi4Kv
 ```
 
-Acceptable providers:
-
-- Resend SMTP
-- Postmark SMTP
-- SendGrid SMTP
-- Mailgun SMTP
-- Gmail app password for demos only
-
-### 5. Google OAuth
-
-Required if Google login should work:
+The Supabase client package and starter files are installed. The product currently uses the existing Express API plus Postgres login path. To move the database to Supabase later, provide the real database password for:
 
 ```bash
-GOOGLE_CLIENT_ID=
-VITE_GOOGLE_CLIENT_ID=
+postgresql://postgres:[YOUR-PASSWORD]@db.vuzfvgawbqbqrqbfuhzg.supabase.co:5432/postgres
 ```
 
-We need the production frontend URL to add to Google OAuth allowed origins.
-
-### 6. GitHub
-
-For the current MVP live import path, either provide:
+### GitHub Live Import
 
 ```bash
-GITHUB_TOKEN=
+GITHUB_TOKEN=github_pat_or_token
 ```
 
 or:
 
 ```bash
-GITHUB_PAT=
+GITHUB_PAT=github_pat_or_token
 ```
 
-The token needs read access to repository issues.
-
-For production-grade GitHub App sync, provide:
-
-```bash
-GITHUB_APP_ID=
-GITHUB_APP_PRIVATE_KEY=
-GITHUB_WEBHOOK_SECRET=
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-```
-
-Production sync-back will need GitHub App installation flow and write permissions for issues, labels, comments, and assignees.
-
-### 7. Deployment URLs
-
-Required:
-
-```bash
-FRONTEND_URL=
-VITE_API_URL=
-VITE_API_PREFIX=/api/v1
-```
-
-We need:
-
-- frontend domain
-- backend/API domain
-- whether frontend and backend will be deployed together or separately
-
-## Optional But Recommended
+Needed only for live GitHub issue import. Without it, Lumina uses mock GitHub import data so demos still work.
 
 ### Gemini Fallback
 
 ```bash
-GEMINI_API_KEY=
+GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-2.0-flash
 ```
 
-Not required if OpenAI is provided.
+Optional. OpenAI is the primary AI provider now.
 
-### Monitoring
+## No Longer Required
 
-Pick one:
+These were removed from the active product path:
 
-- Sentry
-- Axiom
-- Datadog
-- Logtail
-- hosting-provider logs only for demo
+- Social login keys
+- SMTP credentials
+- Email verification setup
+- Password reset email setup
+- GitHub App credentials
 
-### Product Analytics
+## Current Login Model
 
-Pick one:
+- Users sign up with email and password.
+- Signup creates an active account immediately.
+- No email verification.
+- No onboarding gate.
+- No pending approval gate for normal users.
+- Suspended users are blocked.
+- Role checks still apply for admin/super-admin pages.
 
-- PostHog
-- Plausible
-- Vercel Analytics
-- none for hackathon demo
+## Verification Commands
 
-## Remaining Engineering Before Production
-
-The MVP is demo-complete, but these are needed before real customer use:
-
-1. Move Lumina workspace repositories/issues/developers from in-memory arrays into PostgreSQL tables.
-2. Add database migrations instead of relying on a single DDL file.
-3. Implement full GitHub App installation and webhook flow.
-4. Implement real GitHub sync-back writes for comments, labels, assignees, and close/reopen actions.
-5. Add tenant/workspace isolation.
-6. Add billing if this becomes a paid SaaS.
-7. Add stronger RBAC around admin routing and bulk actions.
-8. Add durable audit logs for every AI action.
-9. Add AI token usage tracking.
-10. Add retry queues for GitHub sync and email.
-11. Split the large frontend bundle with route-level lazy loading.
-12. Add Playwright end-to-end tests for the browser workflow.
-
-## Demo Without Any Keys
-
-You can demo the full product loop without keys:
-
-1. Run the app.
-2. Open `/workspace`.
-3. Link a repository using `owner/repo`.
-4. Import issues.
-5. Create a Lumina issue.
-6. Run routing.
-7. Apply routing.
-8. Run analysis.
-9. Approve the plan.
-10. Sync back.
-
-Without keys:
-
-- GitHub import uses mock issues.
-- OpenAI routing/analysis uses rules fallback.
-- Sync-back records a mock sync event.
-
-With keys:
-
-- OpenAI powers routing and analysis.
-- GitHub token powers live issue import.
+```bash
+pnpm run lint
+pnpm run build:frontend
+pnpm --dir backend test
+```

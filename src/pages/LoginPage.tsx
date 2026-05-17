@@ -5,7 +5,6 @@ import Logo from '../components/Logo';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Container from '../components/Container';
-import { GoogleAuthButton } from '../components/GoogleAuthButton';
 import { authApi, type AuthValidationErrorBody } from '../utils/apiClient';
 import './AuthPage.css';
 
@@ -20,9 +19,6 @@ export function LoginPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [showResendVerification, setShowResendVerification] = useState(false);
-  const [resendBusy, setResendBusy] = useState(false);
-  const [resendNote, setResendNote] = useState('');
 
   useEffect(() => {
     const message = (location.state as { message?: string } | null)?.message;
@@ -51,10 +47,6 @@ export function LoginPage() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
-    if (name === 'email') {
-      setShowResendVerification(false);
-      setResendNote('');
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,16 +65,6 @@ export function LoginPage() {
         refreshToken?: string;
       };
       if (!res.ok) {
-        const code = (data as { code?: string }).code;
-        if (res.status === 403 && code === 'EMAIL_NOT_VERIFIED') {
-          localStorage.setItem('pendingVerificationEmail', formData.email);
-          setShowResendVerification(true);
-          setErrors({
-            form:
-              'This email is not activated yet. Open the link we sent you, or resend the verification email.',
-          });
-          return;
-        }
         if (res.status === 400 && data.details && Object.keys(data.details).length > 0) {
           setErrors({
             ...data.details,
@@ -98,7 +80,6 @@ export function LoginPage() {
       if (data.accessToken) {
         localStorage.setItem('authToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken || '');
-        localStorage.removeItem('pendingVerificationEmail');
       }
       navigate('/dashboard');
     } catch {
@@ -140,18 +121,6 @@ export function LoginPage() {
           <motion.div className="auth-header" variants={itemVariants}>
             <h1 className="auth-title">Welcome Back</h1>
             <p className="auth-subtitle">Sign in to your Lumina account</p>
-          </motion.div>
-
-          {/* Google Sign-In - Always prominent */}
-          <motion.div variants={itemVariants}>
-            <GoogleAuthButton
-              mode="signin"
-              onError={(msg) => setErrors((prev) => ({ ...prev, form: msg }))}
-            />
-          </motion.div>
-
-          <motion.div className="auth-divider" variants={itemVariants}>
-            <span>or</span>
           </motion.div>
 
           {/* Form */}
@@ -196,9 +165,6 @@ export function LoginPage() {
                   <label htmlFor="password" className="input-label">
                     Password
                   </label>
-                  <Link to="/forgot-password" className="auth-link-small">
-                    Forgot password?
-                  </Link>
                 </div>
                 <Input
                   id="password"
@@ -227,52 +193,6 @@ export function LoginPage() {
               </motion.div>
             )}
 
-            {showResendVerification && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-                {resendNote ? (
-                  <motion.div className="auth-notice auth-notice--info" variants={itemVariants}>
-                    {resendNote}
-                  </motion.div>
-                ) : null}
-                <motion.div variants={itemVariants}>
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    type="button"
-                    loading={resendBusy}
-                    onClick={async () => {
-                      setResendBusy(true);
-                      setResendNote('');
-                      try {
-                        const r = await authApi.resendVerification(formData.email);
-                        const body = (await r.json().catch(() => ({}))) as {
-                          message?: string;
-                          error?: string;
-                        };
-                        if (!r.ok) {
-                          setResendNote(body.error || 'Could not resend.');
-                        } else {
-                          setResendNote(body.message || 'Verification email sent.');
-                        }
-                      } catch {
-                        setResendNote('Network error. Try again.');
-                      } finally {
-                        setResendBusy(false);
-                      }
-                    }}
-                  >
-                    Resend email
-                  </Button>
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <Link to="/verify-email-otp">
-                    <Button variant="secondary" size="lg" type="button">
-                      Enter 6-digit code
-                    </Button>
-                  </Link>
-                </motion.div>
-              </div>
-            )}
           </motion.form>
 
           {/* Sign Up Link */}

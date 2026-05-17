@@ -47,7 +47,7 @@ const developers = [
   {
     id: 'dev-ava',
     name: 'Ava Tan',
-    email: 'ava@lumina.test',
+    email: 'ava@ralfhton.test',
     role: 'Frontend platform',
     availability: 'available',
     workload: 4,
@@ -56,7 +56,7 @@ const developers = [
   {
     id: 'dev-mateo',
     name: 'Mateo Cruz',
-    email: 'mateo@lumina.test',
+    email: 'mateo@ralfhton.test',
     role: 'Backend services',
     availability: 'busy',
     workload: 7,
@@ -65,7 +65,7 @@ const developers = [
   {
     id: 'dev-priya',
     name: 'Priya Nair',
-    email: 'priya@lumina.test',
+    email: 'priya@ralfhton.test',
     role: 'Product engineer',
     availability: 'available',
     workload: 3,
