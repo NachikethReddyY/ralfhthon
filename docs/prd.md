@@ -21,10 +21,10 @@
 
 ## 3. Non-Goals
 
-- Auto-fixing code or executing code changes automatically.
-- Replacing developers or admins in final decision-making.
-- Supporting a fixed set of task categories at launch.
-- Building a full enterprise workflow system beyond the hackathon scope.
+- Auto-fixing code base or modifying code. 
+- Replacing developers, admins, or collaboratives in final decision-making.
+- Rerouting tasks after it has been allocated to a developer
+- Building a seperate workflow to work around tasks it has been delegated with
 
 ## 4. Users / Personas
 
