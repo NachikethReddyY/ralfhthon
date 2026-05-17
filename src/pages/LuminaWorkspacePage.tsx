@@ -14,6 +14,7 @@ import {
   UploadCloud,
   UserRound,
 } from 'lucide-react';
+import { apiRequest } from '../utils/apiClient';
 import './LuminaWorkspacePage.css';
 
 type IssueStatus = 'open' | 'triaged' | 'assigned' | 'in_progress' | 'blocked' | 'resolved';
@@ -41,6 +42,7 @@ type Developer = {
   workload: number;
   specialties: string[];
   email?: string;
+  githubLogin?: string | null;
 };
 
 type LuminaIssue = {
@@ -157,11 +159,19 @@ const seededIssues: LuminaIssue[] = [
 
 const statuses: IssueStatus[] = ['open', 'triaged', 'assigned', 'in_progress', 'blocked', 'resolved'];
 const severities: IssueSeverity[] = ['critical', 'high', 'medium', 'low'];
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6001';
-const API_PREFIX = import.meta.env.VITE_API_PREFIX || '/api/v1';
+
+type LuminaRequestOptions = {
+  method?: 'GET' | 'POST' | 'PATCH';
+  body?: Record<string, unknown>;
+};
 
 function formatStatus(status: IssueStatus): string {
   return status.replace('_', ' ');
+}
+
+function formatToken(value?: string | null): string {
+  if (!value) return 'local';
+  return value.replace(/_/g, ' ');
 }
 
 function LuminaWorkspacePage() {
@@ -173,6 +183,7 @@ function LuminaWorkspacePage() {
   const [query, setQuery] = useState('');
   const [repositoryInput, setRepositoryInput] = useState('');
   const [syncMessage, setSyncMessage] = useState('Demo fallback is ready.');
+  const [githubStatus, setGithubStatus] = useState<'checking' | 'mock' | 'live' | 'error'>('checking');
   const [workspaceBusy, setWorkspaceBusy] = useState<'idle' | 'loading' | 'linking' | 'syncing' | 'syncback' | 'bulk'>('idle');
   const [form, setForm] = useState({
     title: '',
@@ -196,6 +207,8 @@ function LuminaWorkspacePage() {
   const selectedIssue = issues.find((issue) => issue.id === selectedIssueId) ?? visibleIssues[0] ?? issues[0];
   const selectedRepository = workspaceRepositories.find((repo) => repo.id === selectedRepositoryId) ?? workspaceRepositories[0];
   const assignee = workspaceDevelopers.find((developer) => developer.id === selectedIssue?.assigneeId);
+  const activeRoutingRecommendation = routingRecommendation ?? selectedIssue?.routingRecommendation ?? null;
+  const activeIssueAnalysis = issueAnalysis ?? selectedIssue?.codexAnalysis ?? null;
 
   const statusCounts = statuses.map((status) => ({
     status,
@@ -204,16 +217,16 @@ function LuminaWorkspacePage() {
 
   useEffect(() => {
     void refreshWorkspace(selectedRepositoryId);
+    void refreshGithubStatus();
     // The initial load intentionally runs once; repository changes trigger refresh from the repository buttons.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function updateIssueStatus(status: IssueStatus) {
     if (!selectedIssue) return;
-    const response = await fetch(`${API_BASE_URL}${API_PREFIX}/lumina/issues/${selectedIssue.id}/status`, {
+    const response = await apiRequest(`/lumina/issues/${selectedIssue.id}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
+      body: { status },
     });
     if (response.ok) {
       const data = (await response.json()) as { issue: LuminaIssue };
@@ -231,12 +244,11 @@ function LuminaWorkspacePage() {
 
   async function requestLumina<T>(
     endpoint: string,
-    options: { method?: string; body?: Record<string, unknown> } = {}
+    options: LuminaRequestOptions = {}
   ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${API_PREFIX}/lumina${endpoint}`, {
+    const response = await apiRequest(`/lumina${endpoint}`, {
       method: options.method || 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      body: options.body ? JSON.stringify(options.body) : undefined,
+      body: options.body,
     });
     if (!response.ok) throw new Error(`Request failed: ${response.status}`);
     return response.json() as Promise<T>;
@@ -263,6 +275,17 @@ function LuminaWorkspacePage() {
       if (issueData.issues[0]) setSelectedIssueId(issueData.issues[0].id);
     } finally {
       setWorkspaceBusy('idle');
+    }
+  }
+
+  async function refreshGithubStatus() {
+    try {
+      const data = await requestLumina<{ mode: 'mock' | 'live' | 'error'; message: string }>('/github/status');
+      setGithubStatus(data.mode);
+      setSyncMessage(data.message);
+    } catch (error) {
+      setGithubStatus('error');
+      setSyncMessage(error instanceof Error ? error.message : 'GitHub status check failed.');
     }
   }
 
@@ -321,6 +344,7 @@ function LuminaWorkspacePage() {
         issueId: selectedIssue.id,
       });
       setRoutingRecommendation(data.recommendation);
+      setSyncMessage(`Routing recommendation: ${data.recommendation.developerName} at ${Math.round(data.recommendation.confidence * 100)}% confidence.`);
       setIssues((currentIssues) =>
         currentIssues.map((issue) =>
           issue.id === selectedIssue.id ? { ...issue, routingRecommendation: data.recommendation } : issue
@@ -336,6 +360,17 @@ function LuminaWorkspacePage() {
     const data = await postLumina<{ issue: LuminaIssue }>('/routing/apply', { issueId: selectedIssue.id });
     setIssues((currentIssues) => currentIssues.map((issue) => (issue.id === data.issue.id ? data.issue : issue)));
     setSelectedIssueId(data.issue.id);
+  }
+
+  async function handoffToNextAvailable() {
+    if (!selectedIssue) return;
+    const data = await postLumina<{ issue: LuminaIssue; recommendation: RoutingRecommendation }>('/routing/handoff', {
+      issueId: selectedIssue.id,
+    });
+    setRoutingRecommendation(data.recommendation);
+    setIssues((currentIssues) => currentIssues.map((issue) => (issue.id === data.issue.id ? data.issue : issue)));
+    setSelectedIssueId(data.issue.id);
+    setSyncMessage(`Developer handoff queued for ${data.recommendation.developerName}. Sync back when ready.`);
   }
 
   async function bulkRoute() {
@@ -377,10 +412,9 @@ function LuminaWorkspacePage() {
 
   async function updateApproval(approvalStatus: IssueAnalysis['approval_status']) {
     if (!selectedIssue) return;
-    const response = await fetch(`${API_BASE_URL}${API_PREFIX}/lumina/issues/${selectedIssue.id}/approval`, {
+    const response = await apiRequest(`/lumina/issues/${selectedIssue.id}/approval`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ approvalStatus }),
+      body: { approvalStatus },
     });
     if (!response.ok) throw new Error(`Request failed: ${response.status}`);
     const data = (await response.json()) as { issue: LuminaIssue };
@@ -432,7 +466,7 @@ function LuminaWorkspacePage() {
           <div className="workspace-mark">L</div>
           <div>
             <p>Lumina</p>
-            <span>Task operations</span>
+            <span>Developer issue ops</span>
           </div>
         </div>
 
@@ -440,6 +474,9 @@ function LuminaWorkspacePage() {
           <div className="panel-heading">
             <GitBranch size={16} />
             <span>Repositories</span>
+          </div>
+          <div className={`github-live-status ${githubStatus}`}>
+            <span>{githubStatus === 'live' ? 'GitHub live' : githubStatus === 'checking' ? 'Checking GitHub' : 'Mock GitHub'}</span>
           </div>
           <form className="repository-link-form" onSubmit={linkRepository}>
             <input
@@ -467,7 +504,7 @@ function LuminaWorkspacePage() {
                 type="button"
               >
                 <span>{repo.owner}/{repo.name}</span>
-                <small>{repo.language} · {repo.openIssues ?? 0} open · {repo.syncStatus ?? repo.syncState}</small>
+                <small>{repo.language} · {repo.openIssues ?? 0} open · {formatToken(repo.syncStatus ?? repo.syncState)}</small>
               </button>
             ))}
           </div>
@@ -495,7 +532,7 @@ function LuminaWorkspacePage() {
       <section className="issue-queue" aria-label="Issue queue">
         <header className="workspace-header">
           <div>
-            <span className="eyebrow">{selectedRepository.syncStatus ?? selectedRepository.syncState}</span>
+            <span className="eyebrow">{formatToken(selectedRepository.syncStatus ?? selectedRepository.syncState)}</span>
             <h1>{selectedRepository.name}</h1>
           </div>
           <div className="status-strip">
@@ -561,7 +598,7 @@ function LuminaWorkspacePage() {
                 <span>{formatStatus(issue.status)}</span>
                 <span>{issue.storyPoints} pts</span>
                 <span>{issue.source ?? 'lumina'}</span>
-                <span>{issue.syncStatus ?? 'local'}</span>
+                <span>{formatToken(issue.syncStatus)}</span>
                 <span>{issue.createdAt}</span>
               </div>
             </button>
@@ -603,12 +640,16 @@ function LuminaWorkspacePage() {
                 <strong>{assignee?.name ?? 'Unassigned'}</strong>
               </div>
               <div>
+                <span>GitHub</span>
+                <strong>{selectedIssue.githubIssueNumber ? `#${selectedIssue.githubIssueNumber}` : 'not pushed'}</strong>
+              </div>
+              <div>
                 <span>Approval</span>
-                <strong>{selectedIssue.approvalStatus ?? 'awaiting_go'}</strong>
+                <strong>{formatToken(selectedIssue.approvalStatus ?? 'awaiting_go')}</strong>
               </div>
               <div>
                 <span>Sync</span>
-                <strong>{selectedIssue.syncStatus ?? 'local'}</strong>
+                <strong>{formatToken(selectedIssue.syncStatus)}</strong>
               </div>
             </div>
 
@@ -667,40 +708,43 @@ function LuminaWorkspacePage() {
                 <button disabled={aiState !== 'idle'} onClick={runRouting} type="button">
                   {aiState === 'routing' ? 'Routing...' : 'Run routing'}
                 </button>
-                <button disabled={aiState !== 'idle' || !routingRecommendation} onClick={applyRouting} type="button">
+                <button disabled={aiState !== 'idle' || !activeRoutingRecommendation} onClick={applyRouting} type="button">
                   Apply route
+                </button>
+                <button disabled={aiState !== 'idle'} onClick={handoffToNextAvailable} type="button">
+                  Handoff next available
                 </button>
                 <button disabled={aiState !== 'idle'} onClick={runAnalysis} type="button">
                   {aiState === 'analysis' ? 'Analyzing...' : 'Analyze issue'}
                 </button>
               </div>
-              {routingRecommendation ? (
+              {activeRoutingRecommendation ? (
                 <div className="ai-result-block">
-                  <strong>{routingRecommendation.developerName} · {Math.round(routingRecommendation.confidence * 100)}%</strong>
-                  <p>{routingRecommendation.reason}</p>
-                  {routingRecommendation.workloadComparison ? (
+                  <strong>{activeRoutingRecommendation.developerName} · {Math.round(activeRoutingRecommendation.confidence * 100)}%</strong>
+                  <p>{activeRoutingRecommendation.reason}</p>
+                  {activeRoutingRecommendation.workloadComparison ? (
                     <ul>
-                      {routingRecommendation.workloadComparison.map((item) => (
+                      {activeRoutingRecommendation.workloadComparison.map((item) => (
                         <li key={item.developerId}>{item.name}: {item.workload} active · {item.availability}</li>
                       ))}
                     </ul>
                   ) : null}
-                  <small>{routingRecommendation.source}</small>
+                  <small>{activeRoutingRecommendation.source}</small>
                 </div>
               ) : (
                 <p>Likely owner: {assignee?.name ?? 'Priya Nair'} based on labels, workload, and availability.</p>
               )}
-              {issueAnalysis ? (
+              {activeIssueAnalysis ? (
                 <div className="ai-result-block">
-                  <strong>{issueAnalysis.summary}</strong>
-                  <p>{issueAnalysis.likely_root_cause}</p>
+                  <strong>{activeIssueAnalysis.summary}</strong>
+                  <p>{activeIssueAnalysis.likely_root_cause}</p>
                   <ul>
-                    {issueAnalysis.fix_plan.map((step) => (
+                    {activeIssueAnalysis.fix_plan.map((step) => (
                       <li key={step}>{step}</li>
                     ))}
                   </ul>
-                  <p>Verification: {issueAnalysis.verification_plan.join(' ')}</p>
-                  <small>{issueAnalysis.approval_status} · {issueAnalysis.source}</small>
+                  <p>Verification: {activeIssueAnalysis.verification_plan.join(' ')}</p>
+                  <small>{activeIssueAnalysis.approval_status} · {activeIssueAnalysis.source}</small>
                 </div>
               ) : (
                 <p>Suggested verification: reproduce, patch the affected flow, then confirm status persistence and queue refresh.</p>
@@ -714,7 +758,7 @@ function LuminaWorkspacePage() {
         <form onSubmit={createIssue}>
           <div className="form-title">
             <Plus size={17} />
-            <h2>Create Lumina issue</h2>
+            <h2>Create developer issue</h2>
           </div>
 
           <label>
@@ -778,14 +822,14 @@ function LuminaWorkspacePage() {
           <ShieldAlert size={18} />
           <div>
             <strong>Demo mode</strong>
-            <p>Seeded data and mock GitHub import keep the full loop demoable without credentials.</p>
+            <p>Mock GitHub import keeps the full developer handoff loop demoable without credentials.</p>
           </div>
         </div>
         <div className="routing-card">
           <AlertCircle size={18} />
           <div>
             <strong>Live-ready hooks</strong>
-            <p>Add OpenAI and GitHub keys to switch routing, analysis, import, and sync paths from fallback mode.</p>
+            <p>With GitHub and OpenAI keys, Lumina imports issues, routes to a developer, writes a handoff comment, and creates GitHub issues from local tasks.</p>
           </div>
         </div>
       </aside>

@@ -91,6 +91,33 @@
   margin-bottom: 10px;
 }
 
+.github-live-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 26px;
+  margin: -2px 0 10px;
+  padding: 0 9px;
+  border: 1px solid #cfcdc4;
+  border-radius: 999px;
+  background: #fff;
+  color: #5f5c54;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.github-live-status.live {
+  border-color: #8fd1b0;
+  background: #eaf8f0;
+  color: #176b49;
+}
+
+.github-live-status.error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
 .repository-link-form input {
   min-width: 0;
   height: 38px;
