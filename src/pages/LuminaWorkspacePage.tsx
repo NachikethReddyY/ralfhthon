@@ -98,9 +98,8 @@ const repositories: Repository[] = [
 ];
 
 const developers: Developer[] = [
-  { id: 'dev-ava', name: 'Ava Tan', role: 'Frontend platform', availability: 'available', workload: 4, specialties: ['React', 'Design systems', 'Forms'] },
-  { id: 'dev-mateo', name: 'Mateo Cruz', role: 'Backend services', availability: 'busy', workload: 7, specialties: ['API', 'Postgres', 'Auth'] },
-  { id: 'dev-priya', name: 'Priya Nair', role: 'Product engineer', availability: 'available', workload: 3, specialties: ['Triage', 'Routing', 'Integrations'] },
+  { id: 'dev-cj', name: 'CJ', role: 'Full-stack developer', availability: 'available', workload: 4, specialties: ['React', 'Supabase', 'GitHub'] },
+  { id: 'dev-chong-hao', name: 'Chong Hao', role: 'Backend and AI', availability: 'busy', workload: 7, specialties: ['API', 'Gemini', 'Routing'] },
 ];
 
 const seededIssues: LuminaIssue[] = [
@@ -113,7 +112,7 @@ const seededIssues: LuminaIssue[] = [
     severity: 'high',
     labels: ['frontend', 'state', 'regression'],
     author: 'Mina Park',
-    assigneeId: 'dev-ava',
+    assigneeId: 'dev-cj',
     createdAt: '2026-05-15',
     storyPoints: 3,
   },
@@ -126,7 +125,7 @@ const seededIssues: LuminaIssue[] = [
     severity: 'critical',
     labels: ['backend', 'routing', 'cache'],
     author: 'Evan Holt',
-    assigneeId: 'dev-mateo',
+    assigneeId: 'dev-chong-hao',
     createdAt: '2026-05-14',
     storyPoints: 5,
   },
@@ -151,7 +150,7 @@ const seededIssues: LuminaIssue[] = [
     severity: 'low',
     labels: ['mobile', 'layout'],
     author: 'Cal Webb',
-    assigneeId: 'dev-priya',
+    assigneeId: 'dev-cj',
     createdAt: '2026-05-12',
     storyPoints: 1,
   },
@@ -702,7 +701,7 @@ function LuminaWorkspacePage() {
             <div className="analysis-panel">
               <div>
                 <Bot size={17} />
-                <strong>Codex analysis preview</strong>
+                <strong>Gemini assistant preview</strong>
               </div>
               <div className="ai-action-row">
                 <button disabled={aiState !== 'idle'} onClick={runRouting} type="button">
@@ -732,7 +731,7 @@ function LuminaWorkspacePage() {
                   <small>{formatToken(activeRoutingRecommendation.source)}</small>
                 </div>
               ) : (
-                <p>Likely owner: {assignee?.name ?? 'Priya Nair'} based on labels, workload, and availability.</p>
+                <p>Likely owner: {assignee?.name ?? 'CJ'} based on labels, workload, and availability.</p>
               )}
               {activeIssueAnalysis ? (
                 <div className="ai-result-block">
@@ -829,7 +828,7 @@ function LuminaWorkspacePage() {
           <AlertCircle size={18} />
           <div>
             <strong>Live-ready hooks</strong>
-            <p>With GitHub and OpenAI keys, Lumina imports issues, routes to a developer, writes a handoff comment, and creates GitHub issues from local tasks.</p>
+            <p>With GitHub OAuth and Gemini keys, Lumina imports issues, routes to a developer, writes a handoff comment, and creates GitHub issues from local tasks.</p>
           </div>
         </div>
       </aside>
