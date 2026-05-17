@@ -24,7 +24,7 @@ const initializeDatabase = async () => {
   } catch (error) {
     console.error('Error initializing database:', error.message);
     console.error(
-      'Hint: apply schema with `psql "$DATABASE_URL" -f db/init.sql` if tables are missing.'
+      'Hint: apply schema with `psql "$DATABASE_URL" -f backend/db/DDL.sql` if tables are missing.'
     );
   }
 };

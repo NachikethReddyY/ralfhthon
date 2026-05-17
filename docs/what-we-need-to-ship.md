@@ -7,10 +7,12 @@ Lumina is now trimmed to the main product: simple email/password login, user man
 ### 1. Database
 
 ```bash
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+DATABASE_URL=postgresql://postgres:[YOUR-SUPABASE-DB-PASSWORD]@db.vuzfvgawbqbqrqbfuhzg.supabase.co:5432/postgres
+DATABASE_POOL_MAX=1
+DATABASE_APPLICATION_NAME=lumina-api
 ```
 
-Required for persistent users, tickets, comments, and admin data.
+Required for persistent users, tickets, comments, and admin data. For Vercel/serverless, use the Supabase connection pooler URL instead of the direct database URL if Supabase gives you one.
 
 ### 2. JWT Secret
 
@@ -35,6 +37,8 @@ Required for real AI routing, Codex-style issue analysis, and ticket Q&A. Withou
 FRONTEND_URL=https://your-frontend-domain.com
 VITE_API_URL=
 VITE_API_PREFIX=/api/v1
+VITE_SUPABASE_URL=https://vuzfvgawbqbqrqbfuhzg.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_4y7wbSInrQAcjKAjQrkjnA_P1jMi4Kv
 ```
 
 For local development:
@@ -54,7 +58,7 @@ VITE_SUPABASE_URL=https://vuzfvgawbqbqrqbfuhzg.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_4y7wbSInrQAcjKAjQrkjnA_P1jMi4Kv
 ```
 
-The Supabase client package and starter files are installed. The product currently uses the existing Express API plus Postgres login path. To move the database to Supabase later, provide the real database password for:
+The Supabase client package and starter files are installed. The active product uses the existing Express API against Supabase Postgres. Provide the real database password or full pooler connection string for:
 
 ```bash
 postgresql://postgres:[YOUR-PASSWORD]@db.vuzfvgawbqbqrqbfuhzg.supabase.co:5432/postgres

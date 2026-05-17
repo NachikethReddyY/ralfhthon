@@ -10,6 +10,10 @@ const useSSL =
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  application_name: process.env.DATABASE_APPLICATION_NAME || 'lumina-api',
+  max: Number(process.env.DATABASE_POOL_MAX || (process.env.VERCEL ? 1 : 10)),
+  idleTimeoutMillis: Number(process.env.DATABASE_IDLE_TIMEOUT_MS || 10000),
+  connectionTimeoutMillis: Number(process.env.DATABASE_CONNECTION_TIMEOUT_MS || 10000),
   ...(useSSL && {
     ssl: { rejectUnauthorized: false },
   }),
